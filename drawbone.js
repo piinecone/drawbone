@@ -17,20 +17,30 @@
     }
 
     Canvas.prototype.initialize = function(options) {
-      this.drawTemporaryCanvas(this.$el.attr('id'));
-      this.drawCompositeCanvas(this.$el.attr('id'));
+      this.initializeDom();
       this.initializeEventHandlers();
+      this.initializeTools();
       if ((options != null) && (options.image_url != null)) {
         return this.drawImage(options.image_url);
       }
     };
 
     Canvas.prototype.render = function() {
+      this.tools.render();
       return this;
     };
 
     Canvas.prototype.initializeEventHandlers = function() {
       return this.temporaryCanvas.bind('mousedown mousemove mouseup', this.recordCanvasEvent, this);
+    };
+
+    Canvas.prototype.initializeTools = function() {
+      this.tools = new drawbone.views.Tools({
+        el: this.toolbar,
+        canvas: this.temporaryCanvas,
+        compositeCanvas: this.compositeCanvas
+      });
+      return this.tools.on('toolDidCompleteDrawing', this.toolDidCompleteDrawing, this);
     };
 
     Canvas.prototype.drawImage = function(image_url) {
@@ -48,6 +58,16 @@
     Canvas.prototype.clear = function() {
       this.compositeContext = this.compositeCanvas.getContext('2d');
       return this.compositeContext.clearRect(0, 0, this.compositeCanvas.width, this.compositeCanvas.height);
+    };
+
+    Canvas.prototype.initializeDom = function() {
+      var id_root;
+
+      id_root = this.$el.attr('id');
+      this.toolbar = $("<div id='" + id_root + "_drawbone_tools' />");
+      this.toolbar.appendTo(this.$el);
+      this.drawTemporaryCanvas(id_root);
+      return this.drawCompositeCanvas(id_root);
     };
 
     Canvas.prototype.drawTemporaryCanvas = function(id) {

@@ -3,24 +3,24 @@ window.drawbone =
 
 class drawbone.views.Canvas extends Backbone.View
   initialize: (options) ->
-    @drawTemporaryCanvas @$el.attr('id')
-    @drawCompositeCanvas @$el.attr('id')
+    @initializeDom()
     @initializeEventHandlers()
-    #@initializeTools()
+    @initializeTools()
     @drawImage(options.image_url) if options? and options.image_url?
 
   render: ->
-    #@tools.render()
+    @tools.render()
     @
 
   initializeEventHandlers: ->
     @temporaryCanvas.bind 'mousedown mousemove mouseup', @recordCanvasEvent, @
 
-    #initializeTools: ->
-    #  @tools = new drawbone.views.Tools
-    #    canvas: @temporaryCanvas
-    #    compositeCanvas: @compositeCanvas
-    #  @tools.on 'toolDidCompleteDrawing', @toolDidCompleteDrawing, @
+  initializeTools: ->
+    @tools = new drawbone.views.Tools
+      el: @toolbar
+      canvas: @temporaryCanvas
+      compositeCanvas: @compositeCanvas
+    @tools.on 'toolDidCompleteDrawing', @toolDidCompleteDrawing, @
 
   drawImage: (image_url) ->
     image = new Image()
@@ -32,6 +32,13 @@ class drawbone.views.Canvas extends Backbone.View
   clear: ->
     @compositeContext = @compositeCanvas.getContext '2d'
     @compositeContext.clearRect 0, 0, @compositeCanvas.width, @compositeCanvas.height
+
+  initializeDom: ->
+    id_root = @$el.attr('id')
+    @toolbar = $("<div id='#{id_root}_drawbone_tools' />")
+    @toolbar.appendTo @$el
+    @drawTemporaryCanvas id_root
+    @drawCompositeCanvas id_root
 
   drawTemporaryCanvas: (id) ->
     @temporaryCanvas = $("<canvas />")
