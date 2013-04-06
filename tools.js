@@ -19,7 +19,10 @@
     Tools.prototype.initialize = function(options) {
       this.canvas = options.canvas;
       this.compositeCanvas = options.compositeCanvas;
-      return this.on('canvasEvent', this.canvasEvent, this);
+      this.on('canvasEvent', this.canvasEvent, this);
+      this.initializeTools();
+      this.registerToolTriggers();
+      return this.currentTool = this.pencil;
     };
 
     Tools.prototype.displayDrawingTools = function() {
@@ -30,22 +33,9 @@
     };
 
     Tools.prototype.initializeTools = function() {
-      this.pencil = new applesauce.views.CanvasPencilTool({
+      return this.pencil = new drawbone.tools.Pencil({
         canvas: this.canvas
       });
-      this.rectangle = new applesauce.views.CanvasRectangleTool({
-        canvas: this.canvas
-      });
-      this.line = new applesauce.views.CanvasLineTool({
-        canvas: this.canvas
-      });
-      this.text = new applesauce.views.CanvasTextTool({
-        canvas: this.canvas
-      });
-      this.eraser = new applesauce.views.CanvasEraserTool({
-        canvas: this.compositeCanvas
-      });
-      return this.textInput = new applesauce.views.CanvasTextInputView;
     };
 
     Tools.prototype.render = function() {
@@ -54,13 +44,7 @@
     };
 
     Tools.prototype.registerToolTriggers = function() {
-      this.pencil.on('toolDidCompleteDrawing', this.toolDidCompleteDrawing, this);
-      this.rectangle.on('toolDidCompleteDrawing', this.toolDidCompleteDrawing, this);
-      this.line.on('toolDidCompleteDrawing', this.toolDidCompleteDrawing, this);
-      this.eraser.on('toolDidCompleteDrawing', this.toolDidCompleteDrawing, this);
-      this.text.on('shouldDisplayTextInput', this.shouldDisplayTextInput, this);
-      this.text.on('toolDidCompleteDrawing', this.toolDidCompleteDrawing, this);
-      return this.textInput.on('didEnterText', this.toolDidEnterText, this);
+      return this.pencil.on('toolDidCompleteDrawing', this.toolDidCompleteDrawing, this);
     };
 
     Tools.prototype.onToolSelected = function(event) {
@@ -74,14 +58,6 @@
       switch (selection) {
         case 'pencil':
           return this.pencil;
-        case 'rectangle':
-          return this.rectangle;
-        case 'line':
-          return this.line;
-        case 'text':
-          return this.text;
-        case 'eraser':
-          return this.eraser;
       }
     };
 

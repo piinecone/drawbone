@@ -1,5 +1,6 @@
 window.drawbone =
   views: {}
+  tools: {}
 
 class drawbone.views.Canvas extends Backbone.View
   initialize: (options) ->
@@ -13,13 +14,13 @@ class drawbone.views.Canvas extends Backbone.View
     @
 
   initializeEventHandlers: ->
-    @temporaryCanvas.bind 'mousedown mousemove mouseup', @recordCanvasEvent, @
+    @temporaryCanvas.bind 'mousedown mousemove mouseup', @recordCanvasEvent
 
   initializeTools: ->
     @tools = new drawbone.views.Tools
       el: @toolbar
-      canvas: @temporaryCanvas
-      compositeCanvas: @compositeCanvas
+      canvas: $(@temporaryCanvas)[0]
+      compositeCanvas: $(@compositeCanvas)[0]
     @tools.on 'toolDidCompleteDrawing', @toolDidCompleteDrawing, @
 
   drawImage: (image_url) ->
@@ -43,13 +44,13 @@ class drawbone.views.Canvas extends Backbone.View
   drawTemporaryCanvas: (id) ->
     @temporaryCanvas = $("<canvas />")
     @temporaryCanvas.attr 'id', "#{id}_temporary_canvas"
-    # TODO set dimensions, etc
+    # TODO set dimensions from options, etc
     @temporaryCanvas.appendTo @$el
 
   drawCompositeCanvas: (id) ->
     @compositeCanvas = $("<canvas />")
     @compositeCanvas.attr 'id', "#{id}_composite_canvas"
-    # TODO set dimensions, etc
+    # TODO set dimensions from options, etc
     @compositeCanvas.appendTo @$el
 
   drawingToolSelected: (selection) ->
@@ -61,7 +62,7 @@ class drawbone.views.Canvas extends Backbone.View
     @compositeContext.drawImage @temporaryCanvas, 0, 0
     @temporaryContext.clearRect 0, 0, @temporaryCanvas.width, @temporaryCanvas.height
 
-  recordCanvasEvent: (event) ->
+  recordCanvasEvent: (event) =>
     if event.layerX || event.layerX == 0 # firefox
       event._x = event.layerX
       event._y = event.layerY
